@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="retrieve-consolidated-routes-schedules-MOBILE-expapi-httpListenerConfig">
+        <http:listener-connection host="${http.listener.host}" port="${http.listener.port}" />
+    </http:listener-config>
+    <apikit:config name="retrieve-consolidated-routes-schedules-MOBILE-expapi-config" api="retrieve-consolidated-routes-schedules-MOBILE-expapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="Configuration properties" doc:id="93de4b52-876b-41aa-861f-18b5af22b82f" file="config/${MULE_ENV}.yaml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="9269738b-470f-4d41-a3d3-8bbd3a78f8ac" >
+		<http:request-connection host="${http.requestor.host}" port="${http.requestor.port}" />
+	</http:request-config>
+	<configuration doc:name="Configuration" doc:id="cbe4a428-b1b3-4a6e-91b5-cc66ceeaaebe" defaultErrorHandler-ref="Global-Error-HandlerError_Handler" />
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="9d6c0e31-25d2-40c9-99d6-df33d4ab5ee5" objectStore="Object_store" keyGenerationExpression='#[vars.transportType ++ "routes"]'/>
+	<ee:object-store-caching-strategy name="Caching_Strategy1" doc:name="Caching Strategy" doc:id="602f10aa-4d73-43b9-967f-842e5233e897" keyGenerationExpression='#[vars.transportType ++ "schedules"]' objectStore="Object_store" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="fec3b407-6b5d-4a0d-a836-6d27dceb1539" maxEntries="1000" entryTtl="15" expirationInterval="10" />
+</mule>

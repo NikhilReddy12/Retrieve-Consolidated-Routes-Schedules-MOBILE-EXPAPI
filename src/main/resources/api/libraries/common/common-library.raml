@@ -1,0 +1,13 @@
+#%RAML 1.0 Library
+usage:
+traits:
+  transctionId: !include /libraries/common/Traits/header-Transctionid-trait.raml
+  companyName: !include /libraries/common/Traits/Queryparms-companyName -trait.raml
+  departureLocation: !include /libraries/common/Traits/QueryPrams-deplocation-trait.raml
+  destinationLocation: !include /libraries/common/Traits/QueryPrams-destlocation-trait.raml
+  requestTimezone: !include /libraries/schedules/QueryPrams-ReqstTimezone-trait.raml
+types:
+  get400Resonse: !include common-DataTypes/400-Respnse-dataType.raml
+  get404Response: !include common-DataTypes/404-Resonse-dataType.raml
+  get500Response: !include common-DataTypes/500-Resonsew- dataType.raml
+    

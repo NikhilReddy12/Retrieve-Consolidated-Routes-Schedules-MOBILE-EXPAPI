@@ -1,0 +1,66 @@
+#%RAML 1.0
+title: Retrieve-Consolidated-Routes-Schedules-MOBILE-EXPAPI
+description: this will get result of transport routes.
+uses:
+  common : /libraries/common/common-library.raml
+  routes : /libraries/routes/routes-library.raml
+  schdules : /libraries/schedules/schdules-library.raml
+/booking:
+  /{transportType}:
+    /routes:
+      get:
+        is:
+          - common.transctionId
+          - common.companyName
+          - common.departureLocation
+          - common.destinationLocation 
+        responses:
+          200:
+            body:
+              application/json:
+                type: routes.get200-Response 
+                example: !include /libraries/routes/examples/getResponse-200-example-routes.json
+          400:
+            body:
+              application/json:
+                type: common.get400Resonse
+                example:  !include /libraries/common/examples/400-response-exp.json       
+          404:
+            body:
+              application/json:
+                type: common.get404Response
+                example:  !include libraries/common/examples/404-response-exp.json 
+          500:
+            body:
+              application/json:
+                type:  common.get500Response 
+                example: !include libraries/common/examples/500-response-exp.json                                                   
+    /schedules:
+      get:
+        is:
+          - common.transctionId
+          - common.companyName
+          - common.departureLocation
+          - common.destinationLocation
+          - common.requestTimezone
+        responses:
+          200:
+            body:
+              application/json:
+                type: schdules.get200-response-schd
+                example: !include libraries/schedules/examples/get-Response-200-schedules.json
+          400:
+            body:
+              application/json:
+                type: common.get400Resonse 
+                example: !include libraries/common/examples/400-response-exp.json 
+          404:
+            body:
+              application/json:
+                type: common.get404Response
+                example: !include libraries/common/examples/404-response-exp.json 
+          500:
+            body:
+              application/json:
+                type: common.get500Response
+                example: !include libraries/common/examples/500-response-exp.json

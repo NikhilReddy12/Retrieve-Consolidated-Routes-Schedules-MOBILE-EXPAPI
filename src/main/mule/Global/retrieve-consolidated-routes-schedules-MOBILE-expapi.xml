@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+        <flow name="retrieve-consolidated-routes-schedules-MOBILE-expapi-main">
+        <http:listener config-ref="retrieve-consolidated-routes-schedules-MOBILE-expapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="retrieve-consolidated-routes-schedules-MOBILE-expapi-config" />
+        <error-handler ref="Global-Error-HandlerError_Handler">
+        </error-handler>
+    </flow>
+    <flow name="retrieve-consolidated-routes-schedules-MOBILE-expapi-console">
+        <http:listener config-ref="retrieve-consolidated-routes-schedules-MOBILE-expapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="retrieve-consolidated-routes-schedules-MOBILE-expapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <sub-flow name="retrieve-consolidated-routes-schedules-MOBILE-expapiSub_Flow" doc:id="b08c322f-f67f-4d37-9f4b-f4401dbc2757" >
+	<ee:transform doc:name="Transform Message" doc:id="47430c39-adff-426b-bac2-cbfd7f684a53" >
+            <ee:variables>
+				<ee:set-variable variableName="transc"><![CDATA[attributes.headers.'transctionid']]></ee:set-variable>
+				<ee:set-variable variableName="departureLocation" ><![CDATA[attributes.queryParams.'departureLocation']]></ee:set-variable>
+				<ee:set-variable variableName="transportType" ><![CDATA[attributes.uriParams.'transportType']]></ee:set-variable>
+				<ee:set-variable variableName="transportCompany" ><![CDATA[attributes.queryParams.'companyName']]></ee:set-variable>
+				<ee:set-variable variableName="destinationLocation" ><![CDATA[attributes.queryParams.'destinationLocation']]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        </sub-flow>
+	<flow name="get:\booking\(transportType)\routes:retrieve-consolidated-routes-schedules-MOBILE-expapi-config">
+    <flow-ref doc:name="Flow Reference" doc:id="91f0627b-ccce-4f55-a5f3-c8a74d2db41d" name="retrieve-consolidated-routes-schedules-MOBILE-expapiSub_Flow"/>
+        <logger level="INFO" doc:name="Logger" doc:id="a80e768a-da84-4f8c-a4f1-11b175a0c849" message="Received  the Routes requstes-Routes- TransctionID : #[vars.transc]" />
+		<flow-ref doc:name="Flow Reference" doc:id="45e78444-aba0-49fd-81bc-5157d394faa5" name="Routes-ImplementationSub_Flow" />
+		<logger level="INFO" doc:name="Logger" doc:id="f4da501d-5bef-4441-b76c-7ed6b6d4a812" message="Response given  the Routes requstes -Routes-TransctionID : #[vars.transc]" />  
+    </flow>
+	<flow name="get:\booking\(transportType)\schedules:retrieve-consolidated-routes-schedules-MOBILE-expapi-config">
+    <flow-ref doc:name="Flow Reference" doc:id="11ccd564-6ad2-4b37-8299-a957f6907720" name="retrieve-consolidated-routes-schedules-MOBILE-expapiSub_Flow"/>
+        <logger level="INFO" doc:name="Logger" doc:id="8c7ca325-3db9-4c8b-a775-9f0bde0ae39d" message="Received  the Schedules requstes-Routes- TransctionID : #[vars.transc]" />
+		<flow-ref doc:name="Flow Reference" doc:id="a31ff2f0-eabc-486e-a759-4d9c8d5e56b4" name="Schedules-ImplementationSub_Flow" />
+		<logger level="INFO" doc:name="Logger" doc:id="770cc99c-4c9e-48de-afb8-ec96a964b42e" message="Response given  the  Scheduels requstes -Routes-TransctionID : #[vars.transc]" />  
+    </flow>
+</mule>

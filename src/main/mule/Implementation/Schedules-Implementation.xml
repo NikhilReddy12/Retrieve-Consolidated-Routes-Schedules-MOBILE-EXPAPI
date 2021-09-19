@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<sub-flow name="Schedules-ImplementationSub_Flow" doc:id="541392dc-d735-4cb0-aec5-27c5ccf72b00" >
+	<logger level="INFO" doc:name="Logger" doc:id="2b687ca9-7fb2-4e81-8b51-cc1f645d80eb" />
+		<set-variable value="#[&quot;api/booking/&quot; ++ (vars.transportType default &quot;&quot;) ++ p('http.requestor.schedulepath')]" doc:name="Set Variable" doc:id="c082d388-3c87-45ce-ae57-e0c64b7d70f6" variableName="reqspaty"/>
+		<ee:cache doc:name="Cache" doc:id="93380b10-5b8d-49ec-9adf-2215f450838f" cachingStrategy-ref="Caching_Strategy1">
+			<http:request method="GET" doc:name="Request" doc:id="e0ce46f4-a43b-4429-9403-9043c0e1275a" config-ref="HTTP_Request_configuration" path="#[vars.reqspaty]" responseTimeout="900000">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"TransctionId" : vars.transc
+}]]]></http:headers>
+		</http:request>
+			<ee:transform doc:name="Transform Message" doc:id="78985801-f629-4827-9b62-bf678a64355e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map(val,key)->
+	{
+    "companyName": val.companyName,
+    "availableSeats": 20,
+    "departureDateTime": "2019-04-30T16:41:41",
+    "travelRoute": {
+      "destinationLocation": {
+        "locationDesc": val.travelRoute.destinationLocation.locationDesc
+      },
+      "originLocation": {
+        "locationDesc": val.travelRoute.originLocation.locationDesc
+      }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		</ee:cache>
+	</sub-flow>
+</mule>

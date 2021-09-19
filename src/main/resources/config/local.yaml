@@ -1,0 +1,10 @@
+http:
+  listener:
+    host: "localhost"
+    port: "9084"
+  requestor:
+      host: "localhost"
+      port: "9083"
+      routepath: "/routes"
+      schedulepath: "/schedules"
+    
